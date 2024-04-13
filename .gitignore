@@ -2,3 +2,5 @@
 .github
 .git
 .tfstate
+.terraform
+.hcl
