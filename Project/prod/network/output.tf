@@ -9,7 +9,3 @@ output "private_ip" {
 output "vpc_id" {
   value = module.vpc-prod.vpc_id
 }
-
-output "nat_gateway_id"{
-  value = module.vpc-prod.nat_gateway_id
-}
