@@ -1,5 +1,5 @@
 output "instance_ip" {
-  value = aws_instance.vm1[*].private_ip
+  value = aws_instance.vm[*].private_ip
 }
 
 output "bastion_public_ip" {
