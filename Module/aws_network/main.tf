@@ -11,7 +11,7 @@ locals {
 }
 
 resource "aws_vpc" "vpc" {
-  cidr_block       = var.vpc_cidr_blocks[var.prefix]
+  cidr_block       = var.vpc_cidr_blocks[var.env]
   instance_tenancy = "default"
 
   tags = merge(
