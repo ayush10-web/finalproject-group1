@@ -1,8 +1,21 @@
-variable "prefix" {
+variable "env" {
   default     = "dev"
   type        = string
   description = "Environment Type"
 }
+
+variable "default_tags" {
+  default = {}
+  type        = map(any)
+  description = "Default tags to be appliad to all AWS resources"
+}
+
+variable "prefix" {
+  default     = "Group1"
+  type        = string
+  description = "Group Name"
+}
+
 
 variable "vpc_cidr_blocks" {
   default = {

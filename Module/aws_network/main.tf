@@ -2,13 +2,24 @@ provider "aws" {
   region = "us-east-1"
 }
 
-resource "aws_vpc" "vpc" {
-  cidr_block       = var.vpc_cidr_blocks[var.prefix]
-  instance_tenancy = "default"
+# Local variables
+locals {
+  default_tags = merge(
+    var.default_tags,
+    { "Env" = var.env }
+  )
+  name_prefix = "${var.prefix}-${var.env}"
+}
 
-  tags = {
-    Name = "${var.prefix}--VPC"
-  }
+resource "aws_vpc" "vpc" {
+  cidr_block       = var.vpc_cidr_blocks[var.env]
+  instance_tenancy = "default"
+  
+  tags = merge(
+    local.default_tags, {
+      Name = "${local.name_prefix}-VPC"
+    }
+  )
 }
 
 resource "aws_subnet" "public_sn" {
@@ -17,9 +28,11 @@ resource "aws_subnet" "public_sn" {
   cidr_block        = var.public_sn[count.index]
   availability_zone = var.availability_zone[count.index]
 
-  tags = {
-    Name = "${var.prefix}--Public_SN${count.index + 1}"
-  }
+  tags = merge(
+    local.default_tags, {
+      Name = "${local.name_prefix}--Public_SN${count.index + 1}"
+    }
+  )
 }
 
 resource "aws_subnet" "private_sn" {
@@ -28,9 +41,11 @@ resource "aws_subnet" "private_sn" {
   cidr_block        = var.private_sn[count.index]
   availability_zone = var.availability_zone[count.index]
 
-  tags = {
-    Name = "${var.prefix}--Private_SN${count.index + 1}"
-  }
+  tags = merge(
+    local.default_tags, {
+      Name = "${local.name_prefix}--Private_SN${count.index + 1}"
+    }
+  )
 }
 
 resource "aws_internet_gateway" "igw" {
@@ -48,10 +63,11 @@ resource "aws_eip" "nat_eip" {
 resource "aws_nat_gateway" "natgw" {
   allocation_id = aws_eip.nat_eip.id
   subnet_id     = aws_subnet.public_sn[0].id
-
-  tags = {
-    Name = "NAT GW"
-  }
+  tags = merge(
+    local.default_tags, {
+      Name = "${local.name_prefix}--NAT-GW"
+    }
+  )
 }
 
 
@@ -59,11 +75,13 @@ resource "aws_route_table" "public_route_table" {
   count  = length(aws_subnet.public_sn)
   vpc_id = aws_vpc.vpc.id
 
-  tags = {
-    Name = "${var.prefix}-Public route table ${count.index + 1}"
-  }
-
+  tags = merge(
+    local.default_tags, {
+      Name = "${local.name_prefix}--Public route table-${count.index + 1}"
+    }
+  )
 }
+
 
 resource "aws_route" "public_sn_routes" {
   count                  = length(aws_subnet.public_sn)
@@ -82,9 +100,11 @@ resource "aws_route_table" "private_route_table" {
   count  = length(aws_subnet.private_sn)
   vpc_id = aws_vpc.vpc.id
 
-  tags = {
-    Name = "${var.prefix}--Private subnet route table ${count.index + 1}"
-  }
+  tags = merge(
+    local.default_tags, {
+      Name = "${local.name_prefix}--Private route table-${count.index + 1}"
+    }
+  )
 }
 
 resource "aws_route" "private_sn_routes" {
