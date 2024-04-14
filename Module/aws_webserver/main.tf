@@ -2,6 +2,15 @@ provider "aws" {
   region = "us-east-1"
 }
 
+# Local variables
+locals {
+  default_tags = merge(
+    var.default_tags,
+    { "Env" = var.env }
+  )
+  name_prefix = "${var.prefix}-${var.env}"
+}
+
 //fetching the image for the instance
 data "aws_ami" "latest_amazon_linux" {
   owners      = ["amazon"]
@@ -36,10 +45,12 @@ resource "aws_instance" "vm" {
   root_block_device {
     encrypted = true
   }
-
-  tags = {
-    Name = "${var.env}--VM-${count.index + 1}"
-  }
+  
+  tags = merge(
+    local.default_tags, {
+      Name = "${local.name_prefix}-VM-${count.index + 1}"
+    }
+  )
 }
 
 //setting up the key pair
@@ -79,10 +90,12 @@ resource "aws_security_group" "vm_sg" {
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
   }
-
-  tags = {
-    Name = "${var.env}-VM-Bastion_SG"
-  }
+  
+  tags = merge(
+    local.default_tags, {
+      Name = "${local.name_prefix}-VM-Bastion_SG"
+    }
+  )
 }
 
 //creating the bastion host
@@ -93,10 +106,12 @@ resource "aws_instance" "bastion" {
   subnet_id                   = data.terraform_remote_state.network_output.outputs.public_ip[1]
   security_groups             = [aws_security_group.bastion_sg.id]
   associate_public_ip_address = true
-
-  tags = {
-    Name = "${var.env}--Bastion_VM"
-  }
+  
+  tags = merge(
+    local.default_tags, {
+      Name = "${local.name_prefix}---Bastion_VM"
+    }
+  )
 }
 
 //security group for the bastion host
@@ -131,9 +146,11 @@ resource "aws_security_group" "bastion_sg" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  tags = {
-    Name = "${var.env}--Bastion_SG"
-  }
+  tags = merge(
+    local.default_tags, {
+      Name = "${local.name_prefix}---Bastion_SG"
+    }
+  )
 }
 
 //creating the security group for the load balancer
@@ -155,10 +172,12 @@ resource "aws_security_group" "lb_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  tags = {
-    Name = "ALB-SG"
-  }
+  
+  tags = merge(
+    local.default_tags, {
+      Name = "${local.name_prefix}---ALB-SG"
+    }
+  )
 }
 
 //creating the load balancer
@@ -196,6 +215,7 @@ resource "aws_lb_target_group" "target_group" {
   }
 }
 
+//adding listener to the load balancer
 resource "aws_lb_listener" "web_alb_listener" {
   load_balancer_arn = aws_lb.ALB.arn
   port              = 80
