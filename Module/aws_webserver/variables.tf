@@ -7,7 +7,7 @@ variable "env" {
 variable "instance_types" {
   default = {
     dev     = "t3.micro"
-    prod    = "t3.micro"
+    prod    = "t3.medium"
     staging = "t3.small"
   }
   type        = map(string)

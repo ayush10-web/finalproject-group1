@@ -15,13 +15,13 @@ data "terraform_remote_state" "network_output" {
   backend = "s3"
   config = {
     bucket = "finalprojectacs"
-    key    = "dev/network/terraform.tfstate"
+    key    = "${var.env}/network/terraform.tfstate"
     region = "us-east-1"
   }
 }
 
 resource "aws_instance" "vm1" {
-  count                       = length( data.terraform_remote_state.network_output.outputs.private_ip)
+  count                       = length(data.terraform_remote_state.network_output.outputs.private_ip)
   ami                         = data.aws_ami.latest_amazon_linux.id
   instance_type               = var.instance_types[var.env]
   key_name                    = aws_key_pair.web_key.key_name
@@ -41,7 +41,7 @@ resource "aws_instance" "vm1" {
 }
 
 resource "aws_key_pair" "web_key" {
-  key_name   = "Assignment_key"
+  key_name   = "${var.env}-Assignment_key"
   public_key = file("finalproject.pub")
 }
 
@@ -92,7 +92,7 @@ resource "aws_instance" "bastion" {
   associate_public_ip_address = true
 
   tags = {
-    Name = "Bastion_VM"
+    Name = "${var.env}--Bastion_VM"
   }
 }
 
@@ -129,7 +129,7 @@ resource "aws_security_group" "bastion_sg" {
 
 
   tags = {
-    Name = "Bastion_SG"
+    Name = "${var.env}--Bastion_SG"
   }
 }
 
