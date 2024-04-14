@@ -182,7 +182,7 @@ resource "aws_security_group" "lb_sg" {
 
 //creating the load balancer
 resource "aws_lb" "ALB" {
-  name               = "ALB"
+  name               = "Group1-ALB"
   internal           = false
   load_balancer_type = "application"
   subnets            = data.terraform_remote_state.network_output.outputs.public_ip
@@ -196,7 +196,7 @@ resource "aws_lb" "ALB" {
 
 //creating the target group
 resource "aws_lb_target_group" "target_group" {
-  name     = "web-target-group"
+  name     = "Group1-target-group"
   port     = 80
   protocol = "HTTP"
   vpc_id   = data.terraform_remote_state.network_output.outputs.vpc_id
@@ -229,7 +229,7 @@ resource "aws_lb_listener" "web_alb_listener" {
 
 //creating the launch template as the ami of our vm
 resource "aws_launch_template" "web_launch_template" {
-  name_prefix      = "${var.env}-web-launch-template"
+  name_prefix      = "${var.env}-launch-template"
   image_id         = data.aws_ami.latest_amazon_linux.id
   instance_type    = var.instance_types[var.env]
   key_name         = aws_key_pair.web_key.key_name
@@ -257,7 +257,7 @@ resource "aws_launch_template" "web_launch_template" {
 
 //creating the auto scaling group
 resource "aws_autoscaling_group" "ASG" {
-  name                 = "${var.env}-web-asg"
+  name                 = "${var.env}-Group1-asg"
   vpc_zone_identifier  = data.terraform_remote_state.network_output.outputs.private_ip
   launch_template {
     id      = aws_launch_template.web_launch_template.id
