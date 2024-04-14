@@ -174,6 +174,7 @@ resource "aws_lb" "ALB" {
   }
 }
 
+
 //creating the target group
 resource "aws_lb_target_group" "target_group" {
   name     = "web-target-group"
@@ -192,6 +193,17 @@ resource "aws_lb_target_group" "target_group" {
 
   tags = {
     Name = "Web-Target-Group"
+  }
+}
+
+resource "aws_lb_listener" "web_alb_listener" {
+  load_balancer_arn = aws_lb.ALB.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.target_group.arn
   }
 }
 
