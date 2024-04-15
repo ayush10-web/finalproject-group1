@@ -11,7 +11,7 @@ ssh-keygen
 
 Then copy the content of the key as:
 
-Cat /home/ec2-user/.ssh/id_rsa.pub
+cat /home/ec2-user/.ssh/id_rsa.pub
 
 Then pass the ssh-key to the github
 
