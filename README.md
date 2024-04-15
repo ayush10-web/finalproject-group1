@@ -3,7 +3,7 @@ This is the final year project of Cloud Automation and Control Systems
 
 To start with the project we will start by cloning our repo.
 
-to clone:
+To clone:
 
 Firstly setup the ssh key as:
 
@@ -31,7 +31,7 @@ sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinu
 sudo yum -y install terraform
 
 
-then to deploy dev:
+Then to deploy dev:
   The first step is deploying its networks as:
   1. cd finalproject-group1/Module/aws_network
   2. terraform init
