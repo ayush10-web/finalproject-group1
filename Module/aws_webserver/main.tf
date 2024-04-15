@@ -182,7 +182,7 @@ resource "aws_security_group" "lb_sg" {
 
 //creating the load balancer
 resource "aws_lb" "ALB" {
-  name               = "Group1-ALB"
+  name               = "${var.env}--Group1-ALB"
   internal           = false
   load_balancer_type = "application"
   subnets            = data.terraform_remote_state.network_output.outputs.public_ip
@@ -196,7 +196,7 @@ resource "aws_lb" "ALB" {
 
 //creating the target group
 resource "aws_lb_target_group" "target_group" {
-  name     = "Group1-target-group"
+  name     = "${var.env}--Group1-target-group"
   port     = 80
   protocol = "HTTP"
   vpc_id   = data.terraform_remote_state.network_output.outputs.vpc_id
